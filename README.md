@@ -45,7 +45,31 @@ Everything lives in [`index.html`](index.html). Sections, in order:
 - **Social handles** — lines 603–617 still say `your-handle`. Replace before sharing.
 - **Stat numbers** — lines 538 (countries) and 542 (continents).
 
+## Adding a document
+
+The **docs** tab auto-renders cards from `documents.json` in the repo root. To add a new document:
+
+1. **Drop the file** into `documents/` (e.g. `documents/cv.pdf`).
+2. **Add an entry** to `documents.json`:
+   ```json
+   [
+     {
+       "file": "documents/cv.pdf",
+       "title": "Curriculum Vitae",
+       "description": "Updated for summer 2026.",
+       "tag": "personal",
+       "date": "2026-05"
+     }
+   ]
+   ```
+   Fields: `file` (required, relative path), `title`, `description`, `tag`, `date`. All but `file` are optional.
+3. **Commit and push** — `git add . && git commit -m "add CV" && git push`.
+
+The card appears the moment GitHub Pages redeploys (~30s). File-type badge is auto-derived from the extension.
+
+**Even easier with Claude Code:** drop the file in, then in the repo run `claude` and say *"add documents/cv.pdf as my CV"* — Claude updates `documents.json` for you.
+
 ## Known gaps
 
-- The terminal input on the intro page is wired to a UI but has **no command handler** — typing `help` does nothing yet. JS for it would go into `<script>` around line 773.
-- Social links (GitHub / LinkedIn / Instagram) are placeholders.
+- The terminal input on the intro page is wired to a UI but has **no command handler** — typing `help` does nothing yet. JS for it would go into `<script>` near the end.
+- Social links (GitHub / LinkedIn / Instagram) on the contact page are placeholders.

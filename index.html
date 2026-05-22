@@ -385,6 +385,77 @@
   .stub p { max-width: 520px; margin: 0 auto; }
   .stub strong { color: var(--accent); font-weight: 500; }
 
+  /* DOCS PAGE */
+  .docs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+  .doc-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.4rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    color: inherit;
+    text-decoration: none;
+    transition: all .15s ease;
+  }
+  .doc-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px var(--accent-glow);
+  }
+  .doc-card .doc-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .doc-card .doc-type {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    background: var(--accent-glow);
+    color: var(--accent);
+    padding: 0.22rem 0.5rem;
+    border-radius: 3px;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .doc-card .doc-tag {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    margin-left: auto;
+  }
+  .doc-card .doc-tag::before { content: "#"; opacity: 0.7; }
+  .doc-card .doc-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.35;
+  }
+  .doc-card .doc-desc {
+    font-size: 0.92rem;
+    color: var(--text-dim);
+    flex: 1;
+    line-height: 1.5;
+  }
+  .doc-card .doc-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    color: var(--text-faint);
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--border);
+  }
+  .doc-card .doc-open { color: var(--accent); }
+  .doc-card:hover .doc-open { color: var(--accent-hot); }
+
   /* CONTACT PAGE */
   .contact-card {
     background: var(--bg-card);
@@ -461,9 +532,10 @@
     <div class="tab-list" role="tablist">
       <a class="tab" href="#intro" data-tab="intro"><span class="num">01</span>intro</a>
       <a class="tab" href="#projects" data-tab="projects"><span class="num">02</span>projects</a>
-      <a class="tab" href="#travel" data-tab="travel"><span class="num">03</span>travel</a>
-      <a class="tab" href="#fun" data-tab="fun"><span class="num">04</span>fun</a>
-      <a class="tab" href="#contact" data-tab="contact"><span class="num">05</span>contact</a>
+      <a class="tab" href="#docs" data-tab="docs"><span class="num">03</span>docs</a>
+      <a class="tab" href="#travel" data-tab="travel"><span class="num">04</span>travel</a>
+      <a class="tab" href="#fun" data-tab="fun"><span class="num">05</span>fun</a>
+      <a class="tab" href="#contact" data-tab="contact"><span class="num">06</span>contact</a>
     </div>
   </div>
 </nav>
@@ -518,10 +590,24 @@
     </div>
   </section>
 
+  <!-- DOCS -->
+  <section class="page" id="page-docs" data-page="docs">
+    <div class="page-header">
+      <div class="page-label">03. docs</div>
+      <h1>Documents</h1>
+      <p class="sub">CV, project writeups, anything I want to keep one click away. Drop a file into <code>documents/</code> and add it to <code>documents.json</code> &mdash; it'll show up here.</p>
+    </div>
+    <div class="docs-grid" id="docs-grid"></div>
+    <div class="stub" id="docs-empty" style="display:none">
+      <div class="meta">// no documents yet</div>
+      <p>Drop a file into <strong>documents/</strong> and add an entry to <strong>documents.json</strong> at the repo root.</p>
+    </div>
+  </section>
+
   <!-- TRAVEL -->
   <section class="page" id="page-travel" data-page="travel">
     <div class="page-header">
-      <div class="page-label">03. travel</div>
+      <div class="page-label">04. travel</div>
       <h1>Where I've been</h1>
       <p class="sub">Drag the globe to spin it. Highlighted countries are ones I've set foot in.</p>
     </div>
@@ -575,7 +661,7 @@
   <!-- FUN -->
   <section class="page" id="page-fun" data-page="fun">
     <div class="page-header">
-      <div class="page-label">04. fun</div>
+      <div class="page-label">05. fun</div>
       <h1>Mini projects, for fun</h1>
       <p class="sub">Small things I've coded for the joy of it &mdash; maths visualizations, tiny games, weird ideas that took an afternoon.</p>
     </div>
@@ -588,7 +674,7 @@
   <!-- CONTACT -->
   <section class="page" id="page-contact" data-page="contact">
     <div class="page-header">
-      <div class="page-label">05. contact</div>
+      <div class="page-label">06. contact</div>
       <h1>Get in touch</h1>
       <p class="sub">If you want to say hi, swap travel tips, or just see what someone else is figuring out &mdash; my inbox is open.</p>
     </div>
@@ -672,7 +758,7 @@
   })();
 
   // ---- TAB ROUTING ----
-  const TABS = ["intro","projects","travel","fun","contact"];
+  const TABS = ["intro","projects","docs","travel","fun","contact"];
   const tabEls = document.querySelectorAll(".tab");
   const pageEls = document.querySelectorAll(".page");
 
@@ -682,6 +768,7 @@
     pageEls.forEach(p => p.classList.toggle("active", p.dataset.page === name));
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
     if (name === "travel") initGlobe();
+    if (name === "docs") initDocs();
   }
 
   function fromHash() {
@@ -769,6 +856,50 @@
         document.getElementById("globe-loading").textContent = "couldn't load globe (offline?)";
         console.error(err);
       });
+  }
+
+  // ---- DOCS (lazy init when docs tab first opens) ----
+  let docsInited = false;
+  async function initDocs() {
+    if (docsInited) return;
+    docsInited = true;
+    const grid = document.getElementById("docs-grid");
+    const empty = document.getElementById("docs-empty");
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    try {
+      const res = await fetch("documents.json?t=" + Date.now());
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const docs = await res.json();
+      if (!Array.isArray(docs) || docs.length === 0) {
+        empty.style.display = "block";
+        return;
+      }
+      grid.innerHTML = docs.map(d => {
+        const ext = ((d.file || "").split(".").pop() || "file").toUpperCase().slice(0, 5);
+        return `
+          <a class="doc-card" href="${esc(d.file)}" target="_blank" rel="noopener">
+            <div class="doc-head">
+              <span class="doc-type">${esc(ext)}</span>
+              ${d.tag ? `<span class="doc-tag">${esc(d.tag)}</span>` : ""}
+            </div>
+            <div class="doc-title">${esc(d.title || d.file)}</div>
+            ${d.description ? `<div class="doc-desc">${esc(d.description)}</div>` : ""}
+            <div class="doc-foot">
+              <span>${esc(d.date || "")}</span>
+              <span class="doc-open">open &rarr;</span>
+            </div>
+          </a>
+        `;
+      }).join("");
+    } catch (e) {
+      console.error(e);
+      docsInited = false;
+      grid.innerHTML = `
+        <div class="stub" style="grid-column: 1 / -1">
+          <div class="meta">// couldn't load documents.json</div>
+          <p>If you're viewing this with <code>file://</code>, serve the folder instead (<code>python3 -m http.server</code>). Otherwise check that <strong>documents.json</strong> exists at the repo root and is valid JSON.</p>
+        </div>`;
+    }
   }
 </script>
 

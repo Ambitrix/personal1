@@ -42,6 +42,29 @@ A **single-file static personal website** for Paul Zhang (Maths student at Imper
 - **Projects + Fun pages** are placeholder stubs. They need real cards.
 - **Trip cards** below the globe on the travel page are also a stub.
 
+## Adding a document (common task)
+
+The docs tab is driven by `documents.json` at the repo root. Each entry is:
+
+```json
+{
+  "file": "documents/<filename>",
+  "title": "...",
+  "description": "...",
+  "tag": "coursework | personal | travel | misc",
+  "date": "YYYY-MM"
+}
+```
+
+Workflow when Paul asks you to "add a document":
+
+1. The file should already be in `documents/`. If not, ask where it is and move/copy it in.
+2. Append a new entry to `documents.json`. Keep entries newest-first.
+3. Infer title/description/tag/date from the filename or ask if not obvious. Don't invent dates — use the file's modification time or today's date as a fallback.
+4. Run `git add documents/ documents.json && git commit -m "add <title>"`. Don't push without confirmation.
+
+The file-type badge on each card is auto-derived from the extension in JS — don't add a `type` field to JSON.
+
 ## Conventions for new content
 
 - New page → add to `TABS` array (line 675), add a `<a class="tab">` in nav, add a `<section class="page">` block, add CSS under a clear section comment.
