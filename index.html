@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Paul</title>
-<meta name="description" content="Paul — Maths student at Imperial College London. Curious by default, uncertain by choice." />
+<title>Paul — personal archive</title>
+<meta name="description" content="A personal archive of what I build, where I go, and what I'm trying to understand." />
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<script src="data.js"></script>
 <style>
   :root {
     --bg: #0a0e1a;
@@ -19,6 +20,10 @@
     --accent: #3b9eff;
     --accent-hot: #60b8ff;
     --accent-glow: rgba(59, 158, 255, 0.18);
+    --good: #5ee3a1;
+    --warn: #f0b35e;
+    --paused: #b4a6ff;
+    --done: #5ee3a1;
     --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
   }
@@ -44,208 +49,56 @@
   a { color: var(--accent); text-decoration: none; transition: color .15s ease; }
   a:hover { color: var(--accent-hot); }
 
-  /* NAV / TABS */
-  nav.tabs {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    background: rgba(10, 14, 26, 0.78);
-    border-bottom: 1px solid var(--border);
-  }
-  .tabs-inner {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-  }
-  .logo {
-    font-family: var(--mono);
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--text);
-    padding: 1.1rem 0;
-    flex-shrink: 0;
-  }
+  /* NAV */
+  nav.tabs { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background: rgba(10, 14, 26, 0.78); border-bottom: 1px solid var(--border); }
+  .tabs-inner { max-width: 1080px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+  .logo { font-family: var(--mono); font-weight: 600; font-size: 0.95rem; color: var(--text); padding: 1.1rem 0; flex-shrink: 0; }
   .logo .dot { color: var(--accent); }
-  .tab-list {
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
+  .tab-list { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
   .tab-list::-webkit-scrollbar { display: none; }
-  .tab {
-    font-family: var(--mono);
-    font-size: 0.88rem;
-    color: var(--text-dim);
-    padding: 1.1rem 1.1rem;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-    transition: all .15s ease;
-    white-space: nowrap;
-    text-decoration: none;
-    position: relative;
-  }
+  .tab { font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); padding: 1.1rem 1.1rem; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all .15s ease; white-space: nowrap; text-decoration: none; }
   .tab:hover { color: var(--text); }
-  .tab .num {
-    color: var(--text-faint);
-    margin-right: 0.4rem;
-    font-size: 0.78rem;
-  }
-  .tab.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
+  .tab .num { color: var(--text-faint); margin-right: 0.4rem; font-size: 0.78rem; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
   .tab.active .num { color: var(--accent); }
 
   /* PAGES */
-  main {
-    flex: 1;
-    max-width: 1080px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 0 2rem 4rem;
-  }
-  .page {
-    display: none;
-    padding-top: 3.5rem;
-    animation: pageIn .35s ease;
-  }
+  main { flex: 1; max-width: 1080px; width: 100%; margin: 0 auto; padding: 0 2rem 4rem; }
+  .page { display: none; padding-top: 3.5rem; animation: pageIn .35s ease; }
   .page.active { display: block; }
-  @keyframes pageIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: none; }
-  }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
   .page-header { margin-bottom: 3rem; }
-  .page-label {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    color: var(--accent);
-    margin-bottom: 0.75rem;
-  }
+  .page-label { font-family: var(--mono); font-size: 0.85rem; color: var(--accent); margin-bottom: 0.75rem; }
   .page-label::before { content: "// "; }
-  .page-header h1 {
-    font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 800;
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.02em;
-  }
-  .page-header .sub {
-    color: var(--text-dim);
-    font-size: 1.05rem;
-    max-width: 620px;
-  }
+  .page-header h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+  .page-header .sub { color: var(--text-dim); font-size: 1.05rem; max-width: 620px; }
 
-  /* INTRO PAGE */
-  .intro-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 4rem;
-    align-items: center;
-    min-height: calc(100vh - 14rem);
-  }
-  .intro-left .greeting {
-    font-family: var(--mono);
-    color: var(--accent);
-    margin-bottom: 1.25rem;
-    font-size: 0.95rem;
-  }
-  .intro-left h1 {
-    font-size: clamp(2.75rem, 7vw, 4.5rem);
-    font-weight: 800;
-    margin-bottom: 0.5rem;
-    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -0.03em;
-  }
-  .intro-left h2.tag {
-    font-size: clamp(1.2rem, 2.5vw, 1.7rem);
-    color: var(--text-dim);
-    font-weight: 500;
-    margin-bottom: 2rem;
-    min-height: 2.6em; /* reserves room so layout doesn't jump as text wraps */
-    line-height: 1.3;
-  }
-  .type-caret {
-    display: inline-block;
-    width: 0.55ch;
-    margin-left: 2px;
-    color: var(--accent);
-    font-weight: 400;
-    transform: translateY(-1px);
-    animation: caretBlink 0.85s infinite;
-  }
+  .section-h { font-family: var(--mono); font-size: 0.95rem; color: var(--accent); margin: 3rem 0 1.25rem; letter-spacing: 0.02em; }
+  .section-h::before { content: "// "; }
+  .section-h:first-of-type { margin-top: 0; }
+
+  /* INTRO */
+  .intro-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 4rem; align-items: center; min-height: calc(75vh - 8rem); }
+  .intro-left .greeting { font-family: var(--mono); color: var(--accent); margin-bottom: 1.25rem; font-size: 0.95rem; }
+  .intro-left h1 { font-size: clamp(2.75rem, 7vw, 4.5rem); font-weight: 800; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.03em; }
+  .intro-left h2.tag { font-size: clamp(1.2rem, 2.5vw, 1.7rem); color: var(--text-dim); font-weight: 500; margin-bottom: 2rem; min-height: 2.6em; line-height: 1.3; }
+  .type-caret { display: inline-block; width: 0.55ch; margin-left: 2px; color: var(--accent); font-weight: 400; transform: translateY(-1px); animation: caretBlink 0.85s infinite; }
   @keyframes caretBlink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
-  .intro-left .bio {
-    color: var(--text-dim);
-    font-size: 1.1rem;
-    margin-bottom: 2.5rem;
-    max-width: 540px;
-  }
+  .intro-left .bio { color: var(--text-dim); font-size: 1.05rem; margin-bottom: 2rem; max-width: 540px; }
   .intro-left .bio .hl { color: var(--text); }
   .intro-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
-  .btn {
-    font-family: var(--mono);
-    font-size: 0.88rem;
-    padding: 0.8rem 1.4rem;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    background: transparent;
-    border-radius: 6px;
-    transition: all .2s ease;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex; align-items: center; gap: 0.5rem;
-  }
-  .btn:hover {
-    background: var(--accent-glow);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px var(--accent-glow);
-  }
+  .btn { font-family: var(--mono); font-size: 0.88rem; padding: 0.8rem 1.4rem; border: 1px solid var(--accent); color: var(--accent); background: transparent; border-radius: 6px; transition: all .2s ease; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .btn:hover { background: var(--accent-glow); transform: translateY(-2px); box-shadow: 0 8px 24px var(--accent-glow); }
   .btn.ghost { border-color: var(--border); color: var(--text-dim); }
   .btn.ghost:hover { color: var(--text); border-color: var(--accent); }
 
   /* TERMINAL */
-  .terminal {
-    background: var(--bg-elev);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-  }
-  .terminal-bar {
-    background: #0d1322;
-    padding: 0.55rem 0.85rem;
-    display: flex;
-    gap: 0.4rem;
-    align-items: center;
-    border-bottom: 1px solid var(--border);
-  }
+  .terminal { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px; font-family: var(--mono); font-size: 0.85rem; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4); cursor: text; }
+  .terminal-bar { background: #0d1322; padding: 0.55rem 0.85rem; display: flex; gap: 0.4rem; align-items: center; border-bottom: 1px solid var(--border); }
   .terminal-bar .bdot { width: 11px; height: 11px; border-radius: 50%; background: #2a3148; }
   .terminal-bar .label { margin-left: auto; color: var(--text-faint); font-size: 0.75rem; }
-  .terminal { cursor: text; }
-  .terminal-body {
-    padding: 1rem 1.3rem;
-    color: var(--text-dim);
-    height: 18rem;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    scroll-behavior: smooth;
-  }
+  .terminal-body { padding: 1rem 1.3rem; color: var(--text-dim); height: 18rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0; scroll-behavior: smooth; }
   .terminal-body::-webkit-scrollbar { width: 6px; }
   .terminal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   #term-history { display: flex; flex-direction: column; gap: 0.05rem; }
@@ -254,257 +107,108 @@
   .term-line .path { color: var(--accent-hot); }
   .term-line .punc { color: var(--text-dim); }
   .term-line.out { color: var(--text); }
-  .term-line.kv { display: flex; gap: 0.5rem; color: var(--text); }
-  .term-line.kv .k { color: var(--text-faint); width: 110px; flex-shrink: 0; }
   .term-line.dim { color: var(--text-faint); }
   .term-line.err { color: #ff7b7b; }
   .term-line.hint { color: var(--text-faint); font-style: italic; }
   .term-line.section { color: var(--accent); margin-top: 0.35rem; }
   .term-line .cmd-text { color: var(--text); }
-  .term-line .typing-caret {
-    display: inline-block;
-    width: 0.55ch;
-    background: var(--accent);
-    color: transparent;
-    margin-left: 1px;
-    animation: blink 1s infinite;
-  }
-  .term-input-line {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    margin-top: 0.2rem;
-  }
-  #term-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: inherit;
-    font-size: inherit;
-    caret-color: var(--accent);
-    padding: 0;
-    min-width: 0;
-  }
-  .term-hint-bar {
-    padding: 0.4rem 0.85rem;
-    font-size: 0.7rem;
-    color: var(--text-faint);
-    border-top: 1px solid var(--border);
-    background: rgba(0,0,0,0.18);
-    display: flex;
-    justify-content: flex-end;
-    transition: opacity .25s;
-  }
-  .term-hint-bar code {
-    background: var(--bg-elev);
-    color: var(--accent);
-    padding: 1px 6px;
-    border-radius: 3px;
-    border: 1px solid var(--border);
-    font-size: 0.7rem;
-  }
+  .term-input-line { display: flex; align-items: center; gap: 0; margin-top: 0.2rem; }
+  #term-input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-family: inherit; font-size: inherit; caret-color: var(--accent); padding: 0; min-width: 0; }
+  .term-hint-bar { padding: 0.4rem 0.85rem; font-size: 0.7rem; color: var(--text-faint); border-top: 1px solid var(--border); background: rgba(0,0,0,0.18); display: flex; justify-content: flex-end; transition: opacity .25s; }
+  .term-hint-bar code { background: var(--bg-elev); color: var(--accent); padding: 1px 6px; border-radius: 3px; border: 1px solid var(--border); font-size: 0.7rem; }
   .terminal.active .term-hint-bar { opacity: 0; pointer-events: none; }
-  .cursor {
-    display: inline-block; width: 7px; height: 14px;
-    background: var(--accent);
-    animation: blink 1s infinite;
-    vertical-align: text-bottom;
-  }
-  @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+  /* DASHBOARD */
+  .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 4rem; }
+  .dash-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 1.5rem 1.25rem; transition: border-color .2s, transform .2s; }
+  .dash-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .dash-card .dh { font-family: var(--mono); font-size: 0.82rem; color: var(--accent); margin-bottom: 1rem; letter-spacing: 0.04em; }
+  .dash-card .dh::before { content: "# "; color: var(--text-faint); }
+  .dash-card ul { list-style: none; padding: 0; }
+  .dash-card li { color: var(--text); font-size: 0.93rem; padding: 0.32rem 0 0.32rem 1.05rem; position: relative; }
+  .dash-card li::before { content: "›"; position: absolute; left: 0; color: var(--accent); font-weight: 600; }
+
+  /* STATS BAR */
+  .stats-bar { margin-top: 2.5rem; background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; }
+  .sb-stat .n { font-size: 1.65rem; font-weight: 700; color: var(--accent); line-height: 1; }
+  .sb-stat .l { font-family: var(--mono); font-size: 0.7rem; color: var(--text-faint); margin-top: 0.35rem; letter-spacing: 0.04em; }
+
+  /* CARD */
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; transition: border-color .2s, transform .2s; position: relative; }
+  .card:hover { border-color: var(--accent); }
+  .card h3 { font-size: 1.15rem; margin-bottom: 0.35rem; color: var(--text); letter-spacing: -0.01em; padding-right: 6rem; }
+  .card .meta { font-family: var(--mono); font-size: 0.74rem; color: var(--text-faint); margin-bottom: 1rem; }
+  .card .meta .sep { margin: 0 0.5rem; color: var(--border); }
+  .card .kv-block { margin-top: 0.9rem; }
+  .card .kv-row { display: grid; grid-template-columns: 130px 1fr; gap: 0.75rem; padding: 0.35rem 0; border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--text); }
+  .card .kv-row:first-child { border-top: none; }
+  .card .kv-row .k { font-family: var(--mono); font-size: 0.78rem; color: var(--text-faint); padding-top: 0.15rem; }
+  .card .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; }
+  .card .tag { font-family: var(--mono); font-size: 0.72rem; color: var(--text-dim); background: var(--bg-elev); border: 1px solid var(--border); padding: 0.22rem 0.55rem; border-radius: 4px; }
+
+  /* BADGE */
+  .badge { position: absolute; top: 1.25rem; right: 1.25rem; font-family: var(--mono); font-size: 0.7rem; padding: 0.22rem 0.6rem; border-radius: 100px; text-transform: lowercase; letter-spacing: 0.04em; border: 1px solid; }
+  .badge.building { color: var(--warn); border-color: rgba(240, 179, 94, 0.4); background: rgba(240, 179, 94, 0.08); }
+  .badge.idea { color: var(--paused); border-color: rgba(180, 166, 255, 0.4); background: rgba(180, 166, 255, 0.08); }
+  .badge.paused { color: var(--text-faint); border-color: var(--border); background: rgba(255,255,255,0.02); }
+  .badge.finished, .badge.done { color: var(--good); border-color: rgba(94, 227, 161, 0.4); background: rgba(94, 227, 161, 0.08); }
+  .badge.planning { color: var(--accent); border-color: rgba(59, 158, 255, 0.4); background: var(--accent-glow); }
+  .badge.booked { color: var(--good); border-color: rgba(94, 227, 161, 0.4); background: rgba(94, 227, 161, 0.08); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 
   /* TRAVEL */
-  .travel-grid {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 2.5rem;
-    align-items: start;
-    margin-bottom: 4rem;
-  }
-  .globe-wrap {
-    position: relative;
-    aspect-ratio: 1 / 1;
-    width: 100%;
-    background: radial-gradient(circle at 30% 30%, rgba(59,158,255,0.05), transparent 60%);
-  }
+  .travel-grid { display: grid; grid-template-columns: 1fr 320px; gap: 2.5rem; align-items: start; margin-bottom: 1rem; }
+  .globe-wrap { position: relative; aspect-ratio: 1 / 1; width: 100%; background: radial-gradient(circle at 30% 30%, rgba(59,158,255,0.05), transparent 60%); }
   #globe { width: 100%; height: 100%; cursor: grab; }
   #globe:active { cursor: grabbing; }
-  .globe-loading {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text-faint);
-    font-family: var(--mono); font-size: 0.85rem;
-    pointer-events: none;
-  }
+  .globe-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-faint); font-family: var(--mono); font-size: 0.85rem; pointer-events: none; text-align: center; padding: 1rem; }
   .country { stroke: #0a0e1a; stroke-width: 0.4px; fill: #1c2540; transition: fill .2s; }
   .country.visited { fill: var(--accent); filter: drop-shadow(0 0 6px var(--accent-glow)); }
   .sphere { fill: #0e1426; stroke: var(--border); stroke-width: 1px; }
   .graticule { fill: none; stroke: #1a2238; stroke-width: 0.4px; }
-
-  .travel-side h3 {
-    font-family: var(--mono);
-    font-size: 0.95rem;
-    color: var(--accent);
-    margin-bottom: 1rem;
-  }
+  .travel-side h3 { font-family: var(--mono); font-size: 0.95rem; color: var(--accent); margin-bottom: 1rem; }
   .travel-side h3::before { content: "// "; }
   .stat-row { display: flex; gap: 1rem; margin-bottom: 2rem; }
-  .stat {
-    flex: 1;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1rem 1.1rem;
-  }
+  .stat { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.1rem; }
   .stat .num { font-size: 2rem; font-weight: 700; color: var(--accent); line-height: 1; }
   .stat .lbl { font-family: var(--mono); font-size: 0.75rem; color: var(--text-faint); margin-top: 0.35rem; }
   .country-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-  .country-chip {
-    font-family: var(--mono);
-    font-size: 0.78rem;
-    color: var(--text-dim);
-    background: var(--bg-elev);
-    border: 1px solid var(--border);
-    padding: 0.3rem 0.65rem;
-    border-radius: 4px;
-  }
+  .country-chip { font-family: var(--mono); font-size: 0.78rem; color: var(--text-dim); background: var(--bg-elev); border: 1px solid var(--border); padding: 0.3rem 0.65rem; border-radius: 4px; }
   .country-chip .flag { margin-right: 0.35rem; }
 
-  /* GENERIC STUB */
-  .stub {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    border-radius: 8px;
-    padding: 2rem;
-    color: var(--text-dim);
-    text-align: center;
-  }
-  .stub .meta { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); margin-bottom: 0.75rem; }
-  .stub p { max-width: 520px; margin: 0 auto; }
-  .stub strong { color: var(--accent); font-weight: 500; }
+  /* NOTES */
+  .note-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; }
+  .note { background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 1rem 1.1rem; transition: border-color .2s, transform .15s; }
+  .note:hover { transform: translateY(-2px); border-left-color: var(--accent-hot); }
+  .note h4 { font-size: 0.95rem; color: var(--text); margin-bottom: 0.4rem; font-weight: 600; }
+  .note p { font-size: 0.85rem; color: var(--text-dim); line-height: 1.55; }
+  .note .draft { font-family: var(--mono); font-size: 0.7rem; color: var(--text-faint); margin-top: 0.5rem; }
 
-  /* DOCS PAGE */
-  .docs-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.25rem;
-  }
-  .doc-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    border-radius: 8px;
-    padding: 1.4rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
-    color: inherit;
-    text-decoration: none;
-    transition: all .15s ease;
-  }
-  .doc-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-3px);
-    box-shadow: 0 10px 28px var(--accent-glow);
-  }
-  .doc-card .doc-head {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-  }
-  .doc-card .doc-type {
-    font-family: var(--mono);
-    font-size: 0.68rem;
-    background: var(--accent-glow);
-    color: var(--accent);
-    padding: 0.22rem 0.5rem;
-    border-radius: 3px;
-    letter-spacing: 0.06em;
-    font-weight: 600;
-  }
-  .doc-card .doc-tag {
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    color: var(--text-faint);
-    margin-left: auto;
-  }
-  .doc-card .doc-tag::before { content: "#"; opacity: 0.7; }
-  .doc-card .doc-title {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.35;
-  }
-  .doc-card .doc-desc {
-    font-size: 0.92rem;
-    color: var(--text-dim);
-    flex: 1;
-    line-height: 1.5;
-  }
-  .doc-card .doc-foot {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: var(--mono);
-    font-size: 0.76rem;
-    color: var(--text-faint);
-    padding-top: 0.6rem;
-    border-top: 1px solid var(--border);
-  }
-  .doc-card .doc-open { color: var(--accent); }
-  .doc-card:hover .doc-open { color: var(--accent-hot); }
+  /* TIMELINE */
+  .timeline { border-left: 2px solid var(--border); padding-left: 2rem; margin-left: 1rem; }
+  .timeline-year { margin-bottom: 2.5rem; position: relative; }
+  .timeline-year::before { content: ""; position: absolute; left: -2.65rem; top: 0.65rem; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 0 4px var(--bg); }
+  .timeline-year h3 { font-size: 1.8rem; font-weight: 800; color: var(--text); margin-bottom: 1rem; letter-spacing: -0.02em; }
+  .timeline-year ul { list-style: none; }
+  .timeline-year li { position: relative; padding: 0.4rem 0 0.4rem 1.25rem; color: var(--text-dim); font-size: 0.95rem; }
+  .timeline-year li::before { content: "→"; position: absolute; left: 0; color: var(--accent); font-family: var(--mono); }
 
-  /* CONTACT PAGE */
-  .contact-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 3rem;
-    max-width: 620px;
-  }
-  .contact-card p { color: var(--text-dim); margin-bottom: 2rem; font-size: 1.05rem; }
-  .contact-list { display: flex; flex-direction: column; gap: 0.75rem; }
-  .contact-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    transition: all .15s ease;
-    font-family: var(--mono);
-    font-size: 0.92rem;
-  }
-  .contact-row:hover {
-    border-color: var(--accent);
-    background: var(--accent-glow);
-    transform: translateX(4px);
-  }
-  .contact-row .ico {
-    width: 32px; height: 32px;
-    background: var(--accent-glow);
-    color: var(--accent);
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 600;
-    font-size: 0.9rem;
-    flex-shrink: 0;
-  }
-  .contact-row .where { color: var(--text-faint); margin-left: auto; font-size: 0.82rem; }
+  /* DATA ERROR */
+  .data-error { background: rgba(255, 123, 123, 0.08); border: 1px solid rgba(255, 123, 123, 0.3); color: #ff7b7b; padding: 1.25rem; border-radius: 8px; font-family: var(--mono); font-size: 0.85rem; }
+  .data-error code { background: rgba(0,0,0,0.3); padding: 1px 5px; border-radius: 3px; }
 
   /* FOOTER */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 1.5rem 2rem;
-    text-align: center;
-    color: var(--text-faint);
-    font-family: var(--mono);
-    font-size: 0.8rem;
-  }
-  footer .heart { color: var(--accent); }
+  footer { border-top: 1px solid var(--border); padding: 2.5rem 2rem 2rem; color: var(--text-faint); font-family: var(--mono); font-size: 0.8rem; margin-top: 2rem; }
+  .footer-inner { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center; }
+  .footer-contact { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+  .footer-contact a { color: var(--text-dim); display: inline-flex; align-items: center; gap: 0.4rem; transition: color .15s; }
+  .footer-contact a:hover { color: var(--accent); }
+  .footer-contact .ico { width: 22px; height: 22px; background: var(--accent-glow); color: var(--accent); border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 600; }
+  .footer-meta { text-align: right; }
+  .footer-meta .heart { color: var(--accent); }
+  .footer-meta .updated { display: block; margin-top: 0.4rem; color: var(--text-faint); font-size: 0.72rem; }
 
   /* RESPONSIVE */
   @media (max-width: 920px) {
@@ -512,6 +216,11 @@
     .travel-grid { grid-template-columns: 1fr; }
     .travel-side { order: 2; }
     .globe-wrap { max-width: 480px; margin: 0 auto; }
+    .dashboard { grid-template-columns: 1fr; }
+    .stats-bar { grid-template-columns: repeat(3, 1fr); }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr; text-align: left; }
+    .footer-meta { text-align: left; }
   }
   @media (max-width: 720px) {
     .tabs-inner { padding: 0 1rem; gap: 1rem; }
@@ -520,7 +229,9 @@
     .tab .num { display: none; }
     main { padding: 0 1.25rem 3rem; }
     .page { padding-top: 2rem; }
-    .contact-card { padding: 2rem 1.5rem; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .card h3 { padding-right: 5.5rem; font-size: 1.05rem; }
+    .card .kv-row { grid-template-columns: 100px 1fr; }
   }
 </style>
 </head>
@@ -532,10 +243,10 @@
     <div class="tab-list" role="tablist">
       <a class="tab" href="#intro" data-tab="intro"><span class="num">01</span>intro</a>
       <a class="tab" href="#projects" data-tab="projects"><span class="num">02</span>projects</a>
-      <a class="tab" href="#docs" data-tab="docs"><span class="num">03</span>docs</a>
-      <a class="tab" href="#travel" data-tab="travel"><span class="num">04</span>travel</a>
-      <a class="tab" href="#fun" data-tab="fun"><span class="num">05</span>fun</a>
-      <a class="tab" href="#contact" data-tab="contact"><span class="num">06</span>contact</a>
+      <a class="tab" href="#travel" data-tab="travel"><span class="num">03</span>travel</a>
+      <a class="tab" href="#lab" data-tab="lab"><span class="num">04</span>lab</a>
+      <a class="tab" href="#notes" data-tab="notes"><span class="num">05</span>notes</a>
+      <a class="tab" href="#timeline" data-tab="timeline"><span class="num">06</span>timeline</a>
     </div>
   </div>
 </nav>
@@ -547,15 +258,12 @@
     <div class="intro-grid">
       <div class="intro-left">
         <div class="greeting">$ whoami</div>
-        <h1>Paul.</h1>
+        <h1 id="intro-name">Paul.</h1>
         <h2 class="tag"><span id="typed"></span><span class="type-caret" aria-hidden="true">|</span></h2>
-        <p class="bio">
-          Maths student at <span class="hl">Imperial College London</span>. I don't know what I want
-          to do yet, and I've decided that's the most interesting place to be.
-        </p>
+        <p class="bio" id="intro-bio">&nbsp;</p>
         <div class="intro-cta">
-          <a class="btn" href="#travel" data-tab-link="travel">See the globe &rarr;</a>
-          <a class="btn ghost" href="#contact" data-tab-link="contact">Say hi</a>
+          <a class="btn" href="#projects" data-tab-link="projects">See projects &rarr;</a>
+          <a class="btn ghost" href="#travel" data-tab-link="travel">Spin the globe</a>
         </div>
       </div>
       <div class="intro-right">
@@ -575,41 +283,27 @@
         </div>
       </div>
     </div>
+
+    <div class="dashboard" id="dashboard"></div>
+    <div class="stats-bar" id="stats-bar"></div>
   </section>
 
   <!-- PROJECTS -->
   <section class="page" id="page-projects" data-page="projects">
     <div class="page-header">
       <div class="page-label">02. projects</div>
-      <h1>Things I've made</h1>
-      <p class="sub">Coursework, side projects, anything I've built that I'm willing to put my name on.</p>
+      <h1>Things I'm building</h1>
+      <p class="sub">Coursework, side projects, half-finished experiments. Status is honest — most are in progress.</p>
     </div>
-    <div class="stub">
-      <div class="meta">// nothing here yet</div>
-      <p>Project cards will appear here once you tell <strong>Claude</strong> what you've built.</p>
-    </div>
-  </section>
-
-  <!-- DOCS -->
-  <section class="page" id="page-docs" data-page="docs">
-    <div class="page-header">
-      <div class="page-label">03. docs</div>
-      <h1>Documents</h1>
-      <p class="sub">CV, project writeups, anything I want to keep one click away. Drop a file into <code>documents/</code> and add it to <code>documents.json</code> &mdash; it'll show up here.</p>
-    </div>
-    <div class="docs-grid" id="docs-grid"></div>
-    <div class="stub" id="docs-empty" style="display:none">
-      <div class="meta">// no documents yet</div>
-      <p>Drop a file into <strong>documents/</strong> and add an entry to <strong>documents.json</strong> at the repo root.</p>
-    </div>
+    <div class="grid-2" id="projects-list"></div>
   </section>
 
   <!-- TRAVEL -->
   <section class="page" id="page-travel" data-page="travel">
     <div class="page-header">
-      <div class="page-label">04. travel</div>
-      <h1>Where I've been</h1>
-      <p class="sub">Drag the globe to spin it. Highlighted countries are ones I've set foot in.</p>
+      <div class="page-label">03. travel</div>
+      <h1>Where I've been &amp; where I'm going</h1>
+      <p class="sub">Drag the globe to spin it. Highlighted countries are ones I've set foot in. Trip logs below.</p>
     </div>
 
     <div class="travel-grid">
@@ -617,199 +311,453 @@
         <svg id="globe" viewBox="0 0 500 500" aria-label="Rotatable globe showing visited countries"></svg>
         <div class="globe-loading" id="globe-loading">loading globe&hellip;</div>
       </div>
-
       <div class="travel-side">
-        <div class="stat-row">
-          <div class="stat">
-            <div class="num">16</div>
-            <div class="lbl">countries</div>
-          </div>
-          <div class="stat">
-            <div class="num">4</div>
-            <div class="lbl">continents</div>
-          </div>
-        </div>
-
+        <div class="stat-row" id="travel-stats"></div>
         <h3>the list</h3>
-        <div class="country-list">
-          <span class="country-chip"><span class="flag">&#127464;&#127475;</span>China, PRC</span>
-          <span class="country-chip"><span class="flag">&#127481;&#127484;</span>China, ROC</span>
-          <span class="country-chip"><span class="flag">&#127471;&#127477;</span>Japan</span>
-          <span class="country-chip"><span class="flag">&#127481;&#127469;</span>Thailand</span>
-          <span class="country-chip"><span class="flag">&#127480;&#127468;</span>Singapore</span>
-          <span class="country-chip"><span class="flag">&#127469;&#127472;</span>Hong Kong</span>
-          <span class="country-chip"><span class="flag">&#127483;&#127475;</span>Vietnam</span>
-          <span class="country-chip"><span class="flag">&#127462;&#127466;</span>UAE</span>
-          <span class="country-chip"><span class="flag">&#127478;&#127462;</span>Qatar</span>
-          <span class="country-chip"><span class="flag">&#127468;&#127463;</span>UK</span>
-          <span class="country-chip"><span class="flag">&#127467;&#127479;</span>France</span>
-          <span class="country-chip"><span class="flag">&#127464;&#127469;</span>Switzerland</span>
-          <span class="country-chip"><span class="flag">&#127470;&#127481;</span>Italy</span>
-          <span class="country-chip"><span class="flag">&#127468;&#127479;</span>Greece</span>
-          <span class="country-chip"><span class="flag">&#127469;&#127482;</span>Hungary</span>
-          <span class="country-chip"><span class="flag">&#127482;&#127480;</span>USA</span>
-        </div>
+        <div class="country-list" id="country-list"></div>
       </div>
     </div>
 
-    <div class="stub">
-      <div class="meta">// trip cards coming</div>
-      <p>Tell <strong>Claude</strong> about a few memorable trips and they'll show up here, with room for photos.</p>
-    </div>
+    <h2 class="section-h">trips</h2>
+    <div class="grid-2" id="trips-list"></div>
+
+    <h2 class="section-h">future trips</h2>
+    <div class="grid-3" id="future-trips-list"></div>
   </section>
 
-  <!-- FUN -->
-  <section class="page" id="page-fun" data-page="fun">
+  <!-- LAB -->
+  <section class="page" id="page-lab" data-page="lab">
     <div class="page-header">
-      <div class="page-label">05. fun</div>
-      <h1>Mini projects, for fun</h1>
-      <p class="sub">Small things I've coded for the joy of it &mdash; maths visualizations, tiny games, weird ideas that took an afternoon.</p>
+      <div class="page-label">04. lab</div>
+      <h1>Experiments &amp; mini tools</h1>
+      <p class="sub">Small things I want to build in an afternoon — maths toys, tiny simulators, weird utilities. Mostly stubs for now.</p>
     </div>
-    <div class="stub">
-      <div class="meta">// nothing here yet</div>
-      <p>Tell <strong>Claude</strong> what kind of mini project you'd like to start with &mdash; a Mandelbrot explorer? A pendulum simulator? Conway's Game of Life?</p>
-    </div>
+    <div class="grid-2" id="lab-list"></div>
   </section>
 
-  <!-- CONTACT -->
-  <section class="page" id="page-contact" data-page="contact">
+  <!-- NOTES -->
+  <section class="page" id="page-notes" data-page="notes">
     <div class="page-header">
-      <div class="page-label">06. contact</div>
-      <h1>Get in touch</h1>
-      <p class="sub">If you want to say hi, swap travel tips, or just see what someone else is figuring out &mdash; my inbox is open.</p>
+      <div class="page-label">05. notes</div>
+      <h1>Short notes</h1>
+      <p class="sub">Things I want to remember. Short by design — if a note grows past a paragraph it usually means I haven't understood it yet.</p>
     </div>
+    <div id="notes-container"></div>
+  </section>
 
-    <div class="contact-card">
-      <div class="contact-list">
-        <a class="contact-row" href="mailto:paul.zhang25@imperial.ac.uk">
-          <span class="ico">@</span>
-          <span>paul.zhang25@imperial.ac.uk</span>
-          <span class="where">email</span>
-        </a>
-        <a class="contact-row" href="#">
-          <span class="ico">gh</span>
-          <span>github.com/your-handle</span>
-          <span class="where">code</span>
-        </a>
-        <a class="contact-row" href="#">
-          <span class="ico">in</span>
-          <span>linkedin.com/in/your-handle</span>
-          <span class="where">linkedin</span>
-        </a>
-        <a class="contact-row" href="#">
-          <span class="ico">ig</span>
-          <span>@your-handle</span>
-          <span class="where">instagram</span>
-        </a>
-      </div>
+  <!-- TIMELINE -->
+  <section class="page" id="page-timeline" data-page="timeline">
+    <div class="page-header">
+      <div class="page-label">06. timeline</div>
+      <h1>Where I've been (in time)</h1>
+      <p class="sub">Annual rather than monthly — just enough to look back and see the shape of things.</p>
     </div>
+    <div class="timeline" id="timeline-list"></div>
   </section>
 
 </main>
 
 <footer>
-  built by hand <span class="heart">&lt;3</span> &mdash; <span id="year"></span>
+  <div class="footer-inner">
+    <div class="footer-contact" id="footer-contact"></div>
+    <div class="footer-meta">
+      built by hand <span class="heart">&lt;3</span>
+      <span class="updated">last updated <span id="updated"></span></span>
+    </div>
+  </div>
 </footer>
 
 <script>
-  // year
-  document.getElementById('year').textContent = new Date().getFullYear();
+  // ============================================================
+  // BOOTSTRAP — check that data.js loaded successfully
+  // ============================================================
+  if (typeof window.SITE_DATA === 'undefined') {
+    document.body.innerHTML =
+      '<div class="data-error" style="margin:4rem auto; max-width:680px;">' +
+      '<strong>Could not load <code>data.js</code>.</strong><br><br>' +
+      'If you are opening <code>index.html</code> directly with file://, ' +
+      'browsers block local file loading. Run a tiny server in this folder:<br><br>' +
+      '<code>python3 -m http.server 8000</code><br><br>' +
+      'Then visit <a href="http://localhost:8000">http://localhost:8000</a>.<br>' +
+      'On GitHub Pages this works automatically.' +
+      '</div>';
+    throw new Error('data.js did not load');
+  }
+  const D = window.SITE_DATA;
 
-  // ---- TYPEWRITER (hero quotes) ----
-  (function typewriter() {
-    const quotes = [
-      "Curious by default. Uncertain by choice.",
-      "Half-formed ideas. Fully-formed curiosity.",
-      "Travelling outside. Travelling inside."
+  // ============================================================
+  // SMALL HELPERS
+  // ============================================================
+  function el(tag, attrs, ...kids) {
+    const e = document.createElement(tag);
+    if (attrs) for (const k in attrs) {
+      if (k === 'class') e.className = attrs[k];
+      else if (k === 'html') e.innerHTML = attrs[k];
+      else if (k === 'text') e.textContent = attrs[k];
+      else e.setAttribute(k, attrs[k]);
+    }
+    kids.flat().forEach(k => { if (k != null) e.appendChild(typeof k === 'string' ? document.createTextNode(k) : k); });
+    return e;
+  }
+  const $ = (sel) => document.querySelector(sel);
+
+  // ============================================================
+  // RENDERERS
+  // ============================================================
+
+  // -- intro bio + name
+  function renderIdentity() {
+    const id = D.identity || {};
+    if (id.name) $('#intro-name').textContent = id.name + '.';
+    if (id.bio) {
+      const bio = $('#intro-bio');
+      if (id.bioHighlight && id.bio.includes(id.bioHighlight)) {
+        const parts = id.bio.split(id.bioHighlight);
+        bio.innerHTML = '';
+        bio.appendChild(document.createTextNode(parts[0]));
+        bio.appendChild(el('span', {class:'hl'}, id.bioHighlight));
+        bio.appendChild(document.createTextNode(parts.slice(1).join(id.bioHighlight)));
+      } else {
+        bio.textContent = id.bio;
+      }
+    }
+  }
+
+  // -- footer contact links
+  function renderFooter() {
+    const id = D.identity || {};
+    const wrap = $('#footer-contact');
+    if (id.email) {
+      wrap.appendChild(el('a', {href: 'mailto:' + id.email},
+        el('span', {class:'ico'}, '@'), id.email));
+    }
+    if (id.github) {
+      wrap.appendChild(el('a', {href: 'https://github.com/' + id.github, target: '_blank', rel: 'noopener'},
+        el('span', {class:'ico'}, 'gh'), 'github.com/' + id.github));
+    }
+    if (id.instagram) {
+      wrap.appendChild(el('a', {href: 'https://instagram.com/' + id.instagram.replace(/^@/, ''), target:'_blank', rel:'noopener'},
+        el('span', {class:'ico'}, 'ig'), id.instagram));
+    }
+    // last-updated
+    const d = new Date();
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    $('#updated').textContent = months[d.getMonth()] + " " + d.getFullYear();
+  }
+
+  // -- dashboard cards
+  function renderDashboard() {
+    const dash = D.dashboard || {};
+    const conf = [
+      ['current focus', dash.currentFocus],
+      ['recently',      dash.recently],
+      ['next',          dash.next]
     ];
-    const target = document.getElementById('typed');
-    if (!target) return;
-    // snappy timing
-    const TYPE_MS = 42;
-    const DEL_MS = 22;
-    const HOLD_FULL = 1300;
-    const HOLD_EMPTY = 220;
-    let qi = 0, ci = 0, deleting = false;
+    const wrap = $('#dashboard');
+    wrap.innerHTML = '';
+    conf.forEach(([heading, items]) => {
+      if (!items) return;
+      const ul = el('ul');
+      items.forEach(it => ul.appendChild(el('li', null, it)));
+      wrap.appendChild(el('div', {class:'dash-card'},
+        el('div', {class:'dh'}, heading),
+        ul
+      ));
+    });
+  }
 
+  // -- stats bar
+  function renderStats() {
+    const wrap = $('#stats-bar');
+    wrap.innerHTML = '';
+    (D.stats || []).forEach(s => {
+      wrap.appendChild(el('div', {class:'sb-stat'},
+        el('div', {class:'n'}, String(s.n)),
+        el('div', {class:'l'}, s.l)
+      ));
+    });
+  }
+
+  // -- card builder used by projects, trips, future trips
+  function buildCard(item) {
+    const card = el('div', {class:'card'});
+    // badge
+    if (item.badge) {
+      card.appendChild(el('span', {class:'badge ' + (item.badge.class||'')}, item.badge.label || ''));
+    } else if (item.status) {
+      card.appendChild(el('span', {class:'badge ' + item.status}, item.status));
+    }
+    // title
+    card.appendChild(el('h3', {html: item.title || ''}));
+    // meta
+    if (item.meta) {
+      const meta = el('div', {class:'meta'});
+      meta.innerHTML = item.meta.replace(/·/g, '<span class="sep">·</span>');
+      card.appendChild(meta);
+    }
+    // kv rows
+    if (item.sections && item.sections.length) {
+      const block = el('div', {class:'kv-block'});
+      item.sections.forEach(([k,v]) => {
+        block.appendChild(el('div', {class:'kv-row'},
+          el('div', {class:'k'}, k),
+          el('div', null, v)
+        ));
+      });
+      card.appendChild(block);
+    }
+    // tags
+    if (item.tags && item.tags.length) {
+      const tags = el('div', {class:'tags'});
+      item.tags.forEach(t => tags.appendChild(el('span', {class:'tag'}, t)));
+      card.appendChild(tags);
+    }
+    return card;
+  }
+
+  function renderProjects() {
+    const wrap = $('#projects-list');
+    wrap.innerHTML = '';
+    (D.projects || []).forEach(p => wrap.appendChild(buildCard(p)));
+  }
+
+  function renderTravel() {
+    // stats (countries + continents derived)
+    const tv = D.travel || {};
+    const stRow = $('#travel-stats');
+    stRow.innerHTML = '';
+    const countryCount = (tv.visitedCountries || []).length;
+    const continentCount = (D.stats || []).find(s => s.l === 'continents')?.n || 4;
+    [[countryCount, 'countries'], [continentCount, 'continents']].forEach(([n,l]) => {
+      stRow.appendChild(el('div', {class:'stat'},
+        el('div', {class:'num'}, String(n)),
+        el('div', {class:'lbl'}, l)
+      ));
+    });
+    // country chips
+    const chips = $('#country-list');
+    chips.innerHTML = '';
+    (tv.visitedCountries || []).forEach(c => {
+      const chip = el('span', {class:'country-chip'});
+      chip.innerHTML = '<span class="flag">'+ c.flag + '</span>' + c.name;
+      chips.appendChild(chip);
+    });
+    // trips
+    const trips = $('#trips-list'); trips.innerHTML = '';
+    (tv.trips || []).forEach(t => trips.appendChild(buildCard(t)));
+    // future trips
+    const future = $('#future-trips-list'); future.innerHTML = '';
+    (tv.futureTrips || []).forEach(t => future.appendChild(buildCard(t)));
+  }
+
+  function renderLab() {
+    const wrap = $('#lab-list');
+    wrap.innerHTML = '';
+    (D.lab || []).forEach(it => {
+      // shape lab cards as buildCard input
+      wrap.appendChild(buildCard({
+        title: it.title,
+        status: it.status,
+        meta: it.meta,
+        sections: it.description ? [['idea', it.description]] : []
+      }));
+    });
+  }
+
+  function renderNotes() {
+    const wrap = $('#notes-container');
+    wrap.innerHTML = '';
+    const order = ['quant','coding','travel','life'];
+    order.forEach(cat => {
+      const notes = (D.notes && D.notes[cat]) || [];
+      if (!notes.length) return;
+      wrap.appendChild(el('h2', {class:'section-h'}, cat));
+      const grid = el('div', {class:'note-grid'});
+      notes.forEach(n => {
+        const note = el('div', {class:'note'});
+        note.appendChild(el('h4', null, n.title));
+        if (n.body) note.appendChild(el('p', {html: n.body}));
+        if (n.draft) note.appendChild(el('div', {class:'draft'}, n.draft));
+        grid.appendChild(note);
+      });
+      wrap.appendChild(grid);
+    });
+  }
+
+  function renderTimeline() {
+    const wrap = $('#timeline-list');
+    wrap.innerHTML = '';
+    (D.timeline || []).forEach(y => {
+      const ul = el('ul');
+      (y.items || []).forEach(it => ul.appendChild(el('li', null, it)));
+      wrap.appendChild(el('div', {class:'timeline-year'},
+        el('h3', null, y.year),
+        ul
+      ));
+    });
+  }
+
+  // ============================================================
+  // TYPEWRITER
+  // ============================================================
+  function startTypewriter() {
+    const quotes = (D.identity && D.identity.typewriter) || [];
+    const target = document.getElementById('typed');
+    if (!target || !quotes.length) return;
+    const TYPE_MS = 42, DEL_MS = 22, HOLD_FULL = 1300, HOLD_EMPTY = 220;
+    let qi = 0, ci = 0, deleting = false;
     function step() {
       const q = quotes[qi];
       if (!deleting) {
         ci++;
         target.textContent = q.slice(0, ci);
-        if (ci >= q.length) {
-          deleting = true;
-          setTimeout(step, HOLD_FULL);
-          return;
-        }
+        if (ci >= q.length) { deleting = true; setTimeout(step, HOLD_FULL); return; }
         setTimeout(step, TYPE_MS);
       } else {
         ci--;
         target.textContent = q.slice(0, ci);
-        if (ci <= 0) {
-          deleting = false;
-          qi = (qi + 1) % quotes.length;
-          setTimeout(step, HOLD_EMPTY);
-          return;
-        }
+        if (ci <= 0) { deleting = false; qi = (qi + 1) % quotes.length; setTimeout(step, HOLD_EMPTY); return; }
         setTimeout(step, DEL_MS);
       }
     }
     step();
-  })();
+  }
 
-  // ---- TAB ROUTING ----
-  const TABS = ["intro","projects","docs","travel","fun","contact"];
+  // ============================================================
+  // TAB ROUTING
+  // ============================================================
+  const TABS = ["intro","projects","travel","lab","notes","timeline"];
   const tabEls = document.querySelectorAll(".tab");
   const pageEls = document.querySelectorAll(".page");
-
   function activate(name) {
     if (!TABS.includes(name)) name = "intro";
     tabEls.forEach(t => t.classList.toggle("active", t.dataset.tab === name));
     pageEls.forEach(p => p.classList.toggle("active", p.dataset.page === name));
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
     if (name === "travel") initGlobe();
-    if (name === "docs") initDocs();
   }
+  function fromHash() { activate((location.hash || "#intro").replace("#","")); }
 
-  function fromHash() {
-    const h = (location.hash || "#intro").replace("#","");
-    activate(h);
-  }
+  // ============================================================
+  // TERMINAL
+  // ============================================================
+  function startTerminal() {
+    const term = document.getElementById('terminal');
+    const body = document.getElementById('term-body');
+    const history = document.getElementById('term-history');
+    const input = document.getElementById('term-input');
+    if (!term || !input) return;
 
-  tabEls.forEach(t => {
-    t.addEventListener("click", (e) => {
-      // let the hashchange handler do the work; just close scroll-to-top quirks
+    function scrollDown() { requestAnimationFrame(() => { body.scrollTop = body.scrollHeight; }); }
+    function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+    function addLine(html, cls) {
+      const div = document.createElement('div');
+      div.className = 'term-line' + (cls ? ' ' + cls : '');
+      div.innerHTML = html;
+      history.appendChild(div);
+      scrollDown();
+    }
+    function addPrompt(cmd) {
+      addLine('<span class="prompt">paul@home</span><span class="punc">:</span><span class="path">~</span><span class="punc">$&nbsp;</span><span class="cmd-text">' + escapeHtml(cmd) + '</span>');
+    }
+
+    const COMMANDS = {
+      help: () => {
+        addLine('available commands', 'section');
+        [
+          ['help','show this list'],['about','who I am'],['now',"what I'm up to right now"],
+          ['projects','list active and planned projects'],['travel','countries + continents count'],
+          ['goals',"what I'm working towards"],['notes','note categories'],
+          ['quote','a quote, kind of'],['random','random fact about this site'],['clear','clear the terminal']
+        ].forEach(([k,v]) => addLine('<span style="color:var(--accent); display:inline-block; width:90px;">'+k+'</span><span class="dim">'+v+'</span>'));
+      },
+      about: () => {
+        addLine((D.identity && D.identity.name) + '. Maths student at Imperial College London.', 'out');
+        addLine('Building coding projects, preparing for quant interviews, travelling when I can.', 'dim');
+      },
+      now: () => addLine('Studying maths, building coding projects, preparing for quant, and planning the next trip.', 'out'),
+      projects: () => {
+        addLine('// projects', 'section');
+        (D.projects || []).forEach(p => addLine('<span style="color:var(--text)">'+p.title+'</span> <span class="dim">['+(p.status||'')+']</span>'));
+        addLine('see #projects for full cards.', 'hint');
+      },
+      travel: () => {
+        const n = (D.travel && D.travel.visitedCountries || []).length;
+        addLine(n + ' countries · 4 continents.', 'out');
+        addLine('see #travel for the globe and trip logs.', 'hint');
+      },
+      goals: () => {
+        addLine('// goals', 'section');
+        (D.goals || []).forEach((g,i) => addLine((i+1) + '. ' + g, 'out'));
+      },
+      notes: () => {
+        addLine('// note categories', 'section');
+        addLine(Object.keys(D.notes || {}).join(' · '), 'out');
+        addLine('see #notes.', 'hint');
+      },
+      quote: () => {
+        const qs = D.quotes || ['No quotes set.'];
+        addLine('"' + qs[Math.floor(Math.random() * qs.length)] + '"', 'out');
+      },
+      random: () => {
+        const lines = [
+          "You are currently reading Paul's personal operating system.",
+          'The globe is lazy — it only loads when you click the travel tab.',
+          'This whole site is two files: index.html and data.js.',
+          'To add a project, just append to data.js. No HTML editing.'
+        ];
+        addLine(lines[Math.floor(Math.random() * lines.length)], 'out');
+      },
+      clear: () => { history.innerHTML = ''; },
+      ls: () => addLine('intro  projects  travel  lab  notes  timeline', 'out'),
+      whoami: () => addLine(((D.identity && D.identity.name) || 'paul').toLowerCase(), 'out'),
+      pwd: () => addLine('/home/paul', 'out'),
+      cat: (arg) => {
+        if (!arg) return addLine('cat: missing operand', 'err');
+        if (arg === 'bio.txt' || arg === 'about.txt') return addLine((D.identity && D.identity.bio) || '', 'out');
+        addLine('cat: ' + arg + ': No such file', 'err');
+      }
+    };
+
+    function run(raw) {
+      const cmd = raw.trim();
+      if (!cmd) return;
+      addPrompt(cmd);
+      const [name, ...args] = cmd.split(/\s+/);
+      const fn = COMMANDS[name.toLowerCase()];
+      if (fn) fn(args.join(' '));
+      else addLine(name + ': command not found. type <span style="color:var(--accent)">help</span>.', 'err');
+    }
+
+    addLine('paul@home // personal os // ' + new Date().getFullYear(), 'section');
+    addLine('type <span style="color:var(--accent)">help</span> to see what\'s here.', 'hint');
+
+    term.addEventListener('click', () => { input.focus(); term.classList.add('active'); });
+    input.addEventListener('focus', () => term.classList.add('active'));
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { const v = input.value; input.value = ''; run(v); }
     });
-  });
-  // also handle in-page links that point to other tabs
-  document.querySelectorAll("[data-tab-link]").forEach(a => {
-    a.addEventListener("click", (e) => { /* hashchange fires naturally */ });
-  });
+  }
 
-  window.addEventListener("hashchange", fromHash);
-  fromHash();
-
-  // ---- GLOBE (lazy init when travel tab first opens) ----
+  // ============================================================
+  // GLOBE
+  // ============================================================
   let globeInited = false;
   function initGlobe() {
     if (globeInited) return;
+    if (typeof d3 === 'undefined') {
+      const loading = document.getElementById('globe-loading');
+      if (loading) loading.textContent = "globe needs internet — won't load in offline previews";
+      return;
+    }
     globeInited = true;
 
-    const VISITED = new Set([
-      "156","158","392","764","702","344",
-      "704","784","634","826","250","756",
-      "380","300","348","840"
-    ]);
+    const VISITED = new Set(((D.travel && D.travel.visitedCountries) || []).map(c => String(c.m49)));
 
     const W = 500, H = 500;
     const svg = d3.select("#globe");
-    const projection = d3.geoOrthographic()
-      .scale(220)
-      .translate([W/2, H/2])
-      .clipAngle(90)
-      .rotate([-15, -20]);
+    const projection = d3.geoOrthographic().scale(220).translate([W/2, H/2]).clipAngle(90).rotate([-15, -20]);
     const path = d3.geoPath(projection);
-
     svg.append("path").attr("class", "sphere").attr("d", path({ type: "Sphere" }));
     svg.append("path").attr("class", "graticule").attr("d", path(d3.geoGraticule10()));
 
@@ -817,19 +765,11 @@
       .then(r => r.json())
       .then(world => {
         const countries = topojson.feature(world, world.objects.countries).features;
-
-        const paths = svg.append("g")
-          .selectAll("path")
-          .data(countries)
-          .enter()
-          .append("path")
+        const paths = svg.append("g").selectAll("path").data(countries).enter().append("path")
           .attr("class", d => "country" + (VISITED.has(String(d.id)) ? " visited" : ""))
           .attr("d", path);
-
         document.getElementById("globe-loading").style.display = "none";
-
-        let auto = true;
-        let last;
+        let auto = true, last;
         svg.call(d3.drag()
           .on("start", (e) => { auto = false; last = [e.x, e.y]; })
           .on("drag", (e) => {
@@ -843,7 +783,6 @@
             paths.attr("d", path);
           })
         );
-
         d3.timer(() => {
           if (!auto) return;
           const r = projection.rotate();
@@ -853,54 +792,28 @@
         });
       })
       .catch(err => {
-        document.getElementById("globe-loading").textContent = "couldn't load globe (offline?)";
+        const loading = document.getElementById("globe-loading");
+        if (loading) loading.textContent = "couldn't load globe (offline?)";
         console.error(err);
       });
   }
 
-  // ---- DOCS (lazy init when docs tab first opens) ----
-  let docsInited = false;
-  async function initDocs() {
-    if (docsInited) return;
-    docsInited = true;
-    const grid = document.getElementById("docs-grid");
-    const empty = document.getElementById("docs-empty");
-    const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-    try {
-      const res = await fetch("documents.json?t=" + Date.now());
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const docs = await res.json();
-      if (!Array.isArray(docs) || docs.length === 0) {
-        empty.style.display = "block";
-        return;
-      }
-      grid.innerHTML = docs.map(d => {
-        const ext = ((d.file || "").split(".").pop() || "file").toUpperCase().slice(0, 5);
-        return `
-          <a class="doc-card" href="${esc(d.file)}" target="_blank" rel="noopener">
-            <div class="doc-head">
-              <span class="doc-type">${esc(ext)}</span>
-              ${d.tag ? `<span class="doc-tag">${esc(d.tag)}</span>` : ""}
-            </div>
-            <div class="doc-title">${esc(d.title || d.file)}</div>
-            ${d.description ? `<div class="doc-desc">${esc(d.description)}</div>` : ""}
-            <div class="doc-foot">
-              <span>${esc(d.date || "")}</span>
-              <span class="doc-open">open &rarr;</span>
-            </div>
-          </a>
-        `;
-      }).join("");
-    } catch (e) {
-      console.error(e);
-      docsInited = false;
-      grid.innerHTML = `
-        <div class="stub" style="grid-column: 1 / -1">
-          <div class="meta">// couldn't load documents.json</div>
-          <p>If you're viewing this with <code>file://</code>, serve the folder instead (<code>python3 -m http.server</code>). Otherwise check that <strong>documents.json</strong> exists at the repo root and is valid JSON.</p>
-        </div>`;
-    }
-  }
+  // ============================================================
+  // GO
+  // ============================================================
+  renderIdentity();
+  renderFooter();
+  renderDashboard();
+  renderStats();
+  renderProjects();
+  renderTravel();
+  renderLab();
+  renderNotes();
+  renderTimeline();
+  startTypewriter();
+  startTerminal();
+  window.addEventListener("hashchange", fromHash);
+  fromHash();
 </script>
 
 </body>

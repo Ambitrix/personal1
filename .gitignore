@@ -1,26 +1,19 @@
-# macOS
+# OS
 .DS_Store
-.AppleDouble
-.LSOverride
+Thumbs.db
 
 # Editors
 .vscode/
 .idea/
 *.swp
-*.swo
-*~
 
-# Node (in case a tool drops these in — none committed today)
+# Local dev servers / build output (if you ever add one)
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+dist/
+.cache/
 
-# Env / secrets
+# Secrets — never commit
 .env
 .env.*
-!.env.example
-
-# Build output (none today, but reserved)
-dist/
-build/
+*.pem
+*token*
